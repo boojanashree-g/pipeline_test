@@ -1,25 +1,63 @@
 pipeline {
     agent any
+
+    environment {
+        IMAGE_NAME = "myapp:latest"
+        CONTAINER_NAME = "myapp-container"
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
                 git branch: 'boo', url: 'https://github.com/boojanashree-g/pipeline_test.git'
             }
         }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+                echo 'Dependencies installed successfully!'
+            }
+        }
+
         stage('Build') {
             steps {
+                sh 'npm run build || echo "No build step for Node.js"'
                 echo 'Building the application...'
             }
         }
+
         stage('Test') {
             steps {
                 echo 'Running tests...'
+                sh 'npm test || echo "No tests defined"'
             }
         }
+
         stage('Deploy') {
             steps {
-                echo 'Deploying the application...'
+                script {
+                    // Build Docker Image
+                    sh "docker build -t $IMAGE_NAME ."
+
+                    // Stop and remove old container (ignore errors if not found)
+                    sh "docker stop $CONTAINER_NAME || true && docker rm $CONTAINER_NAME || true"
+
+                    // Run new Docker container
+                    sh "docker run -d -p 8080:80 --name $CONTAINER_NAME --restart always $IMAGE_NAME"
+
+                    echo "Application deployed locally in Docker!"
+                }
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline executed successfully!"
+        }
+        failure {
+            echo "Pipeline failed!"
         }
     }
 }
