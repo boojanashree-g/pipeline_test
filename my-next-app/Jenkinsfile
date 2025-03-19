@@ -1,5 +1,5 @@
 pipeline {
-    agent any  // Use any available agent (instead of `docker`)
+    agent any  // Use any available agent
 
     environment {
         IMAGE_NAME = "myapp:latest"
@@ -15,6 +15,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
+                sh 'npm install'  // Install dependencies
                 echo 'Dependencies installed successfully!'
             }
         }
