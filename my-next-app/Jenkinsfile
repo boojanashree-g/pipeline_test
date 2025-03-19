@@ -1,9 +1,8 @@
 pipeline {
-    agent any
-
-    environment {
-        IMAGE_NAME = "myapp:latest"
-        CONTAINER_NAME = "myapp-container"
+    agent {
+        docker {
+            image 'node:18'  // Use Node.js 18 Docker image
+        }
     }
 
     stages {
@@ -37,14 +36,16 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Build Docker Image
-                    sh "docker build -t $IMAGE_NAME ."
+                    def imageName = "myapp:latest"
 
-                    // Stop and remove old container (ignore errors if not found)
-                    sh "docker stop $CONTAINER_NAME || true && docker rm $CONTAINER_NAME || true"
+                    // Build Docker Image
+                    sh "docker build -t $imageName ."
+
+                    // Stop and remove old container
+                    sh "docker stop myapp-container || true && docker rm myapp-container || true"
 
                     // Run new Docker container
-                    sh "docker run -d -p 8080:80 --name $CONTAINER_NAME --restart always $IMAGE_NAME"
+                    sh "docker run -d -p 8080:80 --name myapp-container --restart always $imageName"
 
                     echo "Application deployed locally in Docker!"
                 }
