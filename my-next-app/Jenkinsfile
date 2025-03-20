@@ -1,5 +1,5 @@
 pipeline {
-    agent {
+  agent {
         docker {
             image 'node:18'  // Using Node.js 18 image
             args '-v /var/run/docker.sock:/var/run/docker.sock'  // Map Docker socket to allow Docker commands inside
@@ -42,16 +42,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Install Docker CLI in the Node container if needed
-                    sh '''
-                    apt-get update
-                    apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
-                    curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-                    apt-get update
-                    apt-get install -y docker-ce-cli
-                    '''
-
                     // Build Docker image
                     sh "docker build -t $IMAGE_NAME ."
 
