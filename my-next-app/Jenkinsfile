@@ -42,7 +42,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Build Docker image
                     sh "docker build -t $IMAGE_NAME ."
 
                     // Stop and remove existing container
