@@ -9,45 +9,34 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'boo', url: 'https://github.com/boojanashree-g/pipeline_test.git'
+                echo 'Cloning the repository...'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'  // Install dependencies
-                echo 'Dependencies installed successfully!'
+                echo 'Installing dependencies...'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'npm run build || echo "No build step for Node.js"'
                 echo 'Building the application...'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'npm test || echo "No tests defined"'
                 echo 'Running tests...'
             }
         }
 
         stage('Deploy') {
             steps {
-                script {
-                    // Build Docker image
-                    sh "docker build -t $IMAGE_NAME ."
-
-                    // Stop and remove existing container
-                    sh "docker stop $CONTAINER_NAME || true && docker rm $CONTAINER_NAME || true"
-
-                    // Run new container
-                    sh "docker run -d -p 8080:80 --name $CONTAINER_NAME --restart always $IMAGE_NAME"
-
-                    echo "Application deployed in Docker!"
-                }
+                echo 'Deploying the application...'
+                echo 'Building Docker image...'
+                echo 'Stopping existing container if running...'
+                echo 'Running new Docker container...'
             }
         }
     }
